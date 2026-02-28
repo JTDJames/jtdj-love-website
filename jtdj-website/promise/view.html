@@ -6,15 +6,12 @@
     <title>Pinky Swear | jtdj.love</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-/* --- NEW CSS START --- */
         :root {
             --bg: #fdf6e3;
             --text: #586e75;
             --accent: #d33682;
-            /* A nice peachy skin tone */
             --skin: #FFDCB9; 
-            /* A slightly darker outline */
-            --skin-outline: #E5C1A0;
+            --skin-dark: #E5C1A0;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -38,6 +35,7 @@
         }
         h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
         p { font-size: 1.2rem; margin-bottom: 2rem; }
+        
         button {
             background-color: var(--accent);
             color: white;
@@ -50,57 +48,91 @@
             transition: transform 0.2s;
         }
         button:hover { transform: scale(1.05); }
-        
-        /* --- THE NEW ANIMATION CSS --- */
+
+        /* --- THE NEW HAND ANIMATION --- */
         .animation-area {
-            height: 200px; /* A bit taller for full hands */
+            height: 180px;
+            width: 100%;
             position: relative;
             margin: 20px 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* overflow: hidden; Removed this so hands can enter from off-stage */
+            overflow: hidden;
         }
 
-        /* The SVG Container */
-        .hands-svg {
-            width: 300px;
-            height: 200px;
-            /* border: 1px solid red;  Uncomment for debugging positioning */
+        .hand-wrapper {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Styles for the SVG shapes */
-        .hand-shape {
-            fill: var(--skin);
-            stroke: var(--skin-outline);
-            stroke-width: 3;
-            stroke-linejoin: round;
-            stroke-linecap: round;
-            transition: all 1.2s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth, bouncy transition */
+        /* Left Hand (Sender) */
+        #leftHand {
+            left: 15%;
+            transform: rotate(-10deg);
         }
 
-        /* Initial State: Waiting */
-        .left-hand-group {
-             /* Sits slightly to the left, rotated out */
-            transform: translateX(-40px) rotate(-10deg);
-        }
-        .right-hand-group {
-            /* Hidden off-screen to the right */
-            transform: translateX(180px) rotate(10deg);
-            opacity: 0; 
+        /* Right Hand (Recipient) - Hidden off-screen right initially */
+        #rightHand {
+            right: -30%;
+            transform: scaleX(-1) rotate(-10deg);
+            opacity: 0;
         }
 
-        /* Final State: Interlocked (Triggered by JS adding this class) */
-        .animation-area.interlocked .left-hand-group {
-            /* Moves to center, hooks pinky */
-            transform: translateX(10px) rotate(5deg);
+        /* The "Fist" part */
+        .fist {
+            width: 70px;
+            height: 60px;
+            background-color: var(--skin);
+            border: 3px solid var(--skin-dark);
+            border-radius: 15px;
+            position: relative;
+            z-index: 2;
+            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.05);
         }
-        .animation-area.interlocked .right-hand-group {
-            /* Slides in, hooks pinky */
-            transform: translateX(-10px) rotate(-5deg);
+
+        /* The extended Pinky Finger */
+        .pinky {
+            width: 22px;
+            height: 50px;
+            background-color: var(--skin);
+            border: 3px solid var(--skin-dark);
+            border-radius: 12px;
+            position: absolute;
+            top: -35px; /* Sits above the fist */
+            transition: all 1.2s ease-in-out;
+            transform-origin: bottom center;
+        }
+
+        #leftHand .pinky { left: 10px; transform: rotate(-15deg); }
+        #rightHand .pinky { left: 10px; transform: rotate(-15deg); }
+
+        /* --- INTERLOCKED STATE --- */
+        .interlocked #leftHand {
+            left: calc(50% - 65px);
+            transform: rotate(0deg);
+        }
+
+        .interlocked #rightHand {
+            right: calc(50% - 65px);
+            transform: scaleX(-1) rotate(0deg);
             opacity: 1;
         }
-        /* --- NEW CSS END --- */
+
+        /* The "Hook" - Pinkies tilt toward each other */
+        .interlocked #leftHand .pinky {
+            transform: rotate(45deg);
+            z-index: 1;
+        }
+
+        .interlocked #rightHand .pinky {
+            transform: rotate(45deg);
+            z-index: 3; /* Right pinky crosses OVER the left one */
+        }
+
     </style>
 </head>
 <body>
@@ -112,26 +144,22 @@
         <h2 id="titleText"></h2>
         <p id="promiseText"></p>
         
-<div class="animation-area" id="animArea">
-            <svg class="hands-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
-                <g class="left-hand-group">
-                    <path class="hand-shape" d="M 60,180 C 60,180 50,120 70,100 C 80,90 100,90 110,100 C 115,105 120,120 120,120 L 130,110 C 130,110 150,60 170,70 C 185,78 175,110 165,125 C 155,140 140,180 140,180 Z" />
-                </g>
-                
-                <g class="right-hand-group">
-                    <path class="hand-shape" d="M 240,180 C 240,180 250,120 230,100 C 220,90 200,90 190,100 C 185,105 180,120 180,120 L 170,110 C 170,110 150,60 130,70 C 115,78 125,110 135,125 C 145,140 160,180 160,180 Z" />
-                </g>
-            </svg>
+        <div class="animation-area" id="animArea">
+            <div class="hand-wrapper" id="leftHand">
+                <div class="pinky"></div>
+                <div class="fist"></div>
+            </div>
+            <div class="hand-wrapper" id="rightHand">
+                <div class="pinky"></div>
+                <div class="fist"></div>
+            </div>
         </div>
-        ```        
+        
         <button id="actionBtn" onclick="acceptPromise()">Pinky Promise</button>
     </div>
 </div>
 
 <script>
-    console.log("View page script starting!");
-    
-    // 1. Initialize Supabase (Renamed to supabaseClient to prevent collision!)
     const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -143,11 +171,10 @@
         const slug = urlParams.get('id');
 
         if (!slug) {
-            document.getElementById('loading').innerText = "Oops! No promise found in the URL.";
+            document.getElementById('loading').innerText = "Oops! No promise found.";
             return;
         }
 
-        // 2. Fetch from Supabase using our new variable name
         const { data, error } = await supabaseClient
             .from('promises')
             .select('*')
@@ -155,8 +182,7 @@
             .single();
 
         if (error || !data) {
-            console.error(error);
-            document.getElementById('loading').innerText = "Promise not found. It might be broken!";
+            document.getElementById('loading').innerText = "Promise not found!";
             return;
         }
 
@@ -186,15 +212,13 @@
     }
 
     async function acceptPromise() {
-        // 3. Update Supabase using our new variable name
         const { error } = await supabaseClient
             .from('promises')
             .update({ is_accepted: true })
             .eq('id', currentPromise.id);
 
         if (error) {
-            alert("Something went wrong saving the promise!");
-            console.error(error);
+            alert("Error saving promise!");
         } else {
             currentPromise.is_accepted = true;
             updateUI();
