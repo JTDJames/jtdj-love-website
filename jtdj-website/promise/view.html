@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Make a Pinky Promise | jtdj.love</title>
+    <title>Pinky Swear | jtdj.love</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg: #fdf6e3;
             --text: #586e75;
             --accent: #d33682;
+            --pinky-skin: #f1c27d; 
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,7 +20,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
             text-align: center;
         }
@@ -28,98 +29,150 @@
             padding: 2rem;
             border-radius: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            max-width: 400px;
+            max-width: 500px;
             width: 90%;
         }
-        h1 { margin-bottom: 1.5rem; font-size: 1.5rem; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
+        h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        p { font-size: 1.2rem; margin-bottom: 2rem; }
         button {
             background-color: var(--accent);
             color: white;
             border: none;
             padding: 15px 30px;
             border-radius: 50px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 20px;
             transition: transform 0.2s;
         }
         button:hover { transform: scale(1.05); }
-        #linkContainer { display: none; margin-top: 20px; word-break: break-all; }
+        
+        /* The Animation CSS */
+        .animation-area {
+            height: 150px;
+            position: relative;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        .hand {
+            width: 40px;
+            height: 100px;
+            background-color: var(--pinky-skin);
+            border-radius: 20px;
+            position: absolute;
+            transition: all 1s ease-in-out;
+        }
+        .hand.left {
+            left: 20%;
+            transform: rotate(25deg);
+        }
+        .hand.right {
+            right: -50px; 
+            transform: rotate(-25deg);
+            opacity: 0;
+        }
+        .interlocked .hand.left {
+            left: calc(50% - 25px);
+            transform: rotate(15deg);
+        }
+        .interlocked .hand.right {
+            right: calc(50% - 25px);
+            transform: rotate(-15deg);
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
 
-<div class="container" id="formContainer">
-    <h1>🤙 Make a Pinky Promise</h1>
-    <input type="text" id="sender" placeholder="Your name">
-    <input type="text" id="recipient" placeholder="Recipient's name">
-    <input type="text" id="promise" placeholder="What do you promise?">
-    <button onclick="createPromise()">Generate Pinky Link</button>
-</div>
-
-<div class="container" id="linkContainer">
-    <p>Your pinky is extended! Send this link:</p>
-    <h3 id="generatedLink"></h3>
-    <button onclick="copyLink()">Copy Link</button>
+<div class="container" id="mainContainer">
+    <div id="loading">Loading promise...</div>
+    
+    <div id="content" style="display: none;">
+        <h2 id="titleText"></h2>
+        <p id="promiseText"></p>
+        
+        <div class="animation-area" id="animArea">
+            <div class="hand left" id="leftHand"></div>
+            <div class="hand right" id="rightHand"></div>
+        </div>
+        
+        <button id="actionBtn" onclick="acceptPromise()">Pinky Promise</button>
+    </div>
 </div>
 
 <script>
-    console.log("Pinky Swear script is running!");
-
     // 1. Initialize Supabase
     const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    async function createPromise() {
-        const sender = document.getElementById('sender').value;
-        const recipient = document.getElementById('recipient').value;
-        const promiseText = document.getElementById('promise').value;
+    let currentPromise = null;
 
-        if (!sender || !recipient || !promiseText) return alert("Fill everything out!");
+    async function loadPromise() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const slug = urlParams.get('id');
 
-        // Create a URL-friendly "slug" (e.g., justin-and-dak-1234)
-        const randomId = Math.random().toString(36).substring(7);
-        const slug = `${sender.toLowerCase()}-and-${recipient.toLowerCase()}-${randomId}`.replace(/\s+/g, '-');
+        if (!slug) {
+            document.getElementById('loading').innerText = "Oops! No promise found in the URL.";
+            return;
+        }
 
-        // 2. Insert into Supabase
+        // 2. Fetch from Supabase
         const { data, error } = await supabase
             .from('promises')
-            .insert([
-                { 
-                    sender_name: sender, 
-                    recipient_name: recipient, 
-                    promise_text: promiseText, 
-                    slug: slug 
-                }
-            ]);
+            .select('*')
+            .eq('slug', slug)
+            .single();
 
-        if (error) {
-            console.error("Supabase Error:", error);
-            alert("Error creating promise. Check the console.");
+        if (error || !data) {
+            document.getElementById('loading').innerText = "Promise not found. It might be broken!";
+            return;
+        }
+
+        currentPromise = data;
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+
+        updateUI();
+    }
+
+    function updateUI() {
+        const titleText = document.getElementById('titleText');
+        const promiseTextEl = document.getElementById('promiseText');
+        const actionBtn = document.getElementById('actionBtn');
+        const animArea = document.getElementById('animArea');
+
+        if (currentPromise.is_accepted) {
+            titleText.innerText = "It's Official! 🎉";
+            promiseTextEl.innerText = `${currentPromise.recipient_name} and ${currentPromise.sender_name} promised: "${currentPromise.promise_text}"`;
+            actionBtn.style.display = 'none';
+            animArea.classList.add('interlocked');
         } else {
-            // 3. Show the link
-            const fullLink = `${window.location.origin}/promise/view.html?id=${slug}`;
-            document.getElementById('formContainer').style.display = 'none';
-            document.getElementById('linkContainer').style.display = 'block';
-            document.getElementById('generatedLink').innerText = fullLink;
+            titleText.innerText = `${currentPromise.sender_name} extends a pinky...`;
+            promiseTextEl.innerText = `Do you promise: "${currentPromise.promise_text}"?`;
+            animArea.classList.remove('interlocked');
         }
     }
 
-    function copyLink() {
-        const link = document.getElementById('generatedLink').innerText;
-        navigator.clipboard.writeText(link);
-        alert("Link copied! Now send it to them.");
+    async function acceptPromise() {
+        const { error } = await supabase
+            .from('promises')
+            .update({ is_accepted: true })
+            .eq('id', currentPromise.id);
+
+        if (error) {
+            alert("Something went wrong saving the promise!");
+            console.error(error);
+        } else {
+            currentPromise.is_accepted = true;
+            updateUI();
+        }
     }
+
+    loadPromise();
 </script>
 
 </body>
