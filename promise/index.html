@@ -6,67 +6,16 @@
     <title>Make a Pinky Promise | jtdj.love</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { 
-            --bg: #fdf6e3; 
-            --text: #586e75; 
-            --accent: #d33682; 
-        }
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0; 
-            text-align: center; 
-        }
-        .container { 
-            background: white; 
-            padding: 2.5rem; 
-            border-radius: 30px; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
-            max-width: 400px; 
-            width: 90%; 
-        }
+        :root { --bg: #fdf6e3; --text: #586e75; --accent: #d33682; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .container { background: white; padding: 2.5rem; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); max-width: 400px; width: 90%; }
         h1 { margin-bottom: 0.5rem; font-size: 1.6rem; color: var(--text); }
         p { font-size: 0.9rem; margin-bottom: 2rem; opacity: 0.8; }
-        
-        input { 
-            width: 100%; 
-            padding: 14px; 
-            margin: 10px 0; 
-            border: 2px solid #f4f4f4; 
-            border-radius: 12px; 
-            box-sizing: border-box; 
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #f4f4f4; border-radius: 12px; box-sizing: border-box; font-size: 1rem; outline: none; transition: border-color 0.3s; }
         input:focus { border-color: var(--accent); }
-
-        button { 
-            background-color: var(--accent); 
-            color: white; 
-            border: none; 
-            padding: 16px 32px; 
-            border-radius: 50px; 
-            font-size: 1.1rem;
-            font-weight: bold; 
-            cursor: pointer; 
-            margin-top: 20px; 
-            width: 100%;
-            transition: transform 0.2s, background-color 0.3s; 
-            box-shadow: 0 4px 15px rgba(211, 54, 130, 0.2);
-        }
-        button:hover { 
-            transform: scale(1.02);
-            background-color: #be2e75; 
-        }
+        button { background-color: var(--accent); color: white; border: none; padding: 16px 32px; border-radius: 50px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; transition: transform 0.2s; box-shadow: 0 4px 15px rgba(211, 54, 130, 0.2); }
+        button:hover { transform: scale(1.02); }
         button:disabled { background-color: #ccc; cursor: not-allowed; }
-
         .footer-logo { margin-top: 30px; font-weight: bold; font-size: 1.2rem; opacity: 0.5; }
     </style>
 </head>
@@ -75,73 +24,53 @@
 <div class="container" id="formContainer">
     <h1>🤙 Pinky Swear</h1>
     <p>Create a digital bond that sparkles.</p>
-    
     <input type="text" id="sender" placeholder="Your name (e.g., JJ)" required>
     <input type="text" id="recipient" placeholder="Recipient's name" required>
     <input type="text" id="promise" placeholder="What do you promise?" required>
-    
     <button id="generateBtn">Generate & Extend Pinky</button>
 </div>
-
 <div class="footer-logo">jtdj.love</div>
 
 <script>
-    // --- SUPABASE CONFIG ---
     const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    const generateBtn = document.getElementById('generateBtn');
-
-    generateBtn.addEventListener('click', async () => {
+    document.getElementById('generateBtn').addEventListener('click', async () => {
         const sender = document.getElementById('sender').value.trim();
         const recipient = document.getElementById('recipient').value.trim();
         const promiseText = document.getElementById('promise').value.trim();
 
         if (!sender || !recipient || !promiseText) {
-            alert("Please fill in all the fields before extending your pinky!");
+            alert("Fill in all fields first!");
             return;
         }
 
-        // Disable button and show loading state
-        generateBtn.disabled = true;
-        generateBtn.innerText = "Creating Bond...";
+        const btn = document.getElementById('generateBtn');
+        btn.disabled = true;
+        btn.innerText = "Creating Bond...";
 
-        // Generate a unique URL-friendly slug
         const randomId = Math.random().toString(36).substring(7);
         const slug = `${sender.toLowerCase()}-and-${recipient.toLowerCase()}-${randomId}`.replace(/\s+/g, '-');
 
-        try {
-            // 1. Insert into Supabase
-            const { error } = await supabaseClient
-                .from('promises')
-                .insert([{ 
-                    sender_name: sender, 
-                    recipient_name: recipient, 
-                    promise_text: promiseText, 
-                    slug: slug,
-                    is_accepted: false // Default state
-                }]);
+        const { error } = await supabaseClient
+            .from('promises')
+            .insert([{ sender_name: sender, recipient_name: recipient, promise_text: promiseText, slug: slug }]);
 
-            if (error) throw error;
-
-            // 2. Build the Sender URL
-            // This assumes view.html is in the same 'promise' folder
-            const currentPath = window.location.pathname;
-            const newPath = currentPath.replace('index.html', 'view.html');
-            const senderUrl = `${window.location.origin}${newPath}?id=${slug}&role=s&new=true`;
-
-            // 3. Redirect!
-            window.location.href = senderUrl;
-
-        } catch (err) {
-            console.error("Supabase Error:", err);
-            alert("Something went wrong on our end. Please try again!");
-            generateBtn.disabled = false;
-            generateBtn.innerText = "Generate & Extend Pinky";
+        if (error) {
+            alert("Error creating promise.");
+            btn.disabled = false;
+            btn.innerText = "Generate & Extend Pinky";
+        } else {
+            // THE FIX: Explicitly point to view.html in the current folder
+            const url = new URL('view.html', window.location.href);
+            url.searchParams.set('id', slug);
+            url.searchParams.set('role', 's');
+            url.searchParams.set('new', 'true');
+            
+            window.location.href = url.toString();
         }
     });
 </script>
-
 </body>
 </html>
