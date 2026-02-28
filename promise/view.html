@@ -163,7 +163,7 @@
         if (currentPromise.is_accepted) {
             container.className = "container accepted";
             document.getElementById('titleText').innerText = "It's Official! 🎉";
-            promiseTextEl.innerHTML = `<strong>${currentPromise.recipient_name}</strong> and <strong>${currentPromise.sender_name}</strong> promised:<br>"${currentPromise.promise_text}"`;
+            promiseTextEl.innerHTML = `<strong>${currentPromise.recipient_name}</strong> and <strong>${currentPromise.sender_name}</strong> promise:<br>"${currentPromise.promise_text}"`;
             document.getElementById('actionBtn').style.display = 'none';
             document.getElementById('statusNote').style.display = 'none';
         } else if (role === 's') {
