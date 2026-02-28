@@ -73,6 +73,8 @@
 </div>
 
 <script>
+    console.log("Pinky Swear script is running!");
+
     // 1. Initialize Supabase
     const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
@@ -102,7 +104,7 @@
             ]);
 
         if (error) {
-            console.error(error);
+            console.error("Supabase Error:", error);
             alert("Error creating promise. Check the console.");
         } else {
             // 3. Show the link
