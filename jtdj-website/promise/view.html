@@ -10,8 +10,6 @@
             --bg: #fdf6e3;
             --text: #586e75;
             --accent: #d33682;
-            --skin: #FFDCB9; 
-            --skin-dark: #E5C1A0;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,132 +25,81 @@
         }
         .container {
             background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            max-width: 500px;
+            padding: 2.5rem;
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            max-width: 450px;
             width: 90%;
         }
-        h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
-        p { font-size: 1.2rem; margin-bottom: 2rem; }
+        h2 { font-size: 1.6rem; margin-bottom: 0.5rem; color: var(--text); }
+        p { font-size: 1.1rem; line-height: 1.5; margin-bottom: 2rem; }
         
+        /* The Illustration Area */
+        .illustration-container {
+            margin: 30px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px;
+        }
+
+        /* SVG Styling */
+        .pinky-icon {
+            width: 120px;
+            height: 120px;
+            fill: none;
+            stroke: var(--text);
+            stroke-width: 1.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.5s ease;
+            opacity: 0.6;
+        }
+
+        /* Animation when accepted */
+        .accepted .pinky-icon {
+            stroke: var(--accent);
+            opacity: 1;
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 10px rgba(211, 54, 130, 0.2));
+        }
+
         button {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 16px 32px;
             border-radius: 50px;
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(211, 54, 130, 0.3);
         }
-        button:hover { transform: scale(1.05); }
-
-        /* --- THE NEW HAND ANIMATION --- */
-        .animation-area {
-            height: 180px;
-            width: 100%;
-            position: relative;
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(211, 54, 130, 0.4);
         }
-
-        .hand-wrapper {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Left Hand (Sender) */
-        #leftHand {
-            left: 15%;
-            transform: rotate(-10deg);
-        }
-
-        /* Right Hand (Recipient) - Hidden off-screen right initially */
-        #rightHand {
-            right: -30%;
-            transform: scaleX(-1) rotate(-10deg);
-            opacity: 0;
-        }
-
-        /* The "Fist" part */
-        .fist {
-            width: 70px;
-            height: 60px;
-            background-color: var(--skin);
-            border: 3px solid var(--skin-dark);
-            border-radius: 15px;
-            position: relative;
-            z-index: 2;
-            box-shadow: inset -4px -4px 8px rgba(0,0,0,0.05);
-        }
-
-        /* The extended Pinky Finger */
-        .pinky {
-            width: 22px;
-            height: 50px;
-            background-color: var(--skin);
-            border: 3px solid var(--skin-dark);
-            border-radius: 12px;
-            position: absolute;
-            top: -35px; /* Sits above the fist */
-            transition: all 1.2s ease-in-out;
-            transform-origin: bottom center;
-        }
-
-        #leftHand .pinky { left: 10px; transform: rotate(-15deg); }
-        #rightHand .pinky { left: 10px; transform: rotate(-15deg); }
-
-        /* --- INTERLOCKED STATE --- */
-        .interlocked #leftHand {
-            left: calc(50% - 65px);
-            transform: rotate(0deg);
-        }
-
-        .interlocked #rightHand {
-            right: calc(50% - 65px);
-            transform: scaleX(-1) rotate(0deg);
-            opacity: 1;
-        }
-
-        /* The "Hook" - Pinkies tilt toward each other */
-        .interlocked #leftHand .pinky {
-            transform: rotate(45deg);
-            z-index: 1;
-        }
-
-        .interlocked #rightHand .pinky {
-            transform: rotate(45deg);
-            z-index: 3; /* Right pinky crosses OVER the left one */
-        }
-
+        button:active { transform: translateY(0); }
     </style>
 </head>
 <body>
 
 <div class="container" id="mainContainer">
-    <div id="loading">Loading promise...</div>
+    <div id="loading">Gathering the promise...</div>
     
     <div id="content" style="display: none;">
         <h2 id="titleText"></h2>
         <p id="promiseText"></p>
         
-        <div class="animation-area" id="animArea">
-            <div class="hand-wrapper" id="leftHand">
-                <div class="pinky"></div>
-                <div class="fist"></div>
-            </div>
-            <div class="hand-wrapper" id="rightHand">
-                <div class="pinky"></div>
-                <div class="fist"></div>
-            </div>
+        <div class="illustration-container" id="illustrate">
+            <svg class="pinky-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 10c-1.1 0-2 .9-2 2v3c0 1.1-.9 2-2 2s-2-.9-2-2v-3c0-1.1-.9-2-2-2s-2 .9-2 2v3c0 1.1-.9 2-2 2s-2-.9-2-2V8c0-1.1.9-2 2-2s2 .9 2 2v1"/>
+                <path d="M10 12c0-1.1.9-2 2-2s2 .9 2 2v3"/>
+                <path d="M14 10c0-1.1.9-2 2-2s2 .9 2 2v3"/>
+                <path d="M6 15c0 1.1.9 2 2 2s2-.9 2-2v-3c0-1.1-.9-2-2-2s-2 .9-2 2v3z"/>
+                <path d="M18 13c0 1.1.9 2 2 2s2-.9 2-2v-5c0-1.1-.9-2-2-2s-2 .9-2 2v5z"/>
+            </svg>
         </div>
         
         <button id="actionBtn" onclick="acceptPromise()">Pinky Promise</button>
@@ -171,7 +118,7 @@
         const slug = urlParams.get('id');
 
         if (!slug) {
-            document.getElementById('loading').innerText = "Oops! No promise found.";
+            document.getElementById('loading').innerText = "No promise link found.";
             return;
         }
 
@@ -182,7 +129,7 @@
             .single();
 
         if (error || !data) {
-            document.getElementById('loading').innerText = "Promise not found!";
+            document.getElementById('loading').innerText = "This promise doesn't exist yet!";
             return;
         }
 
@@ -197,17 +144,26 @@
         const titleText = document.getElementById('titleText');
         const promiseTextEl = document.getElementById('promiseText');
         const actionBtn = document.getElementById('actionBtn');
-        const animArea = document.getElementById('animArea');
+        const container = document.getElementById('mainContainer');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const role = urlParams.get('role');
 
         if (currentPromise.is_accepted) {
             titleText.innerText = "It's Official! 🎉";
-            promiseTextEl.innerText = `${currentPromise.recipient_name} and ${currentPromise.sender_name} promised: "${currentPromise.promise_text}"`;
+            promiseTextEl.innerHTML = `<strong>${currentPromise.recipient_name}</strong> and <strong>${currentPromise.sender_name}</strong><br>have promised: "${currentPromise.promise_text}"`;
             actionBtn.style.display = 'none';
-            animArea.classList.add('interlocked');
+            container.classList.add('accepted');
         } else {
-            titleText.innerText = `${currentPromise.sender_name} extends a pinky...`;
-            promiseTextEl.innerText = `Do you promise: "${currentPromise.promise_text}"?`;
-            animArea.classList.remove('interlocked');
+            if (role === 's') {
+                titleText.innerText = "Awaiting the promise...";
+                promiseTextEl.innerText = `You're asking ${currentPromise.recipient_name} to promise: "${currentPromise.promise_text}"`;
+                actionBtn.style.display = 'none';
+            } else {
+                titleText.innerText = `${currentPromise.sender_name} extends a pinky...`;
+                promiseTextEl.innerText = `Do you promise: "${currentPromise.promise_text}"?`;
+                actionBtn.style.display = 'inline-block';
+            }
         }
     }
 
@@ -218,7 +174,7 @@
             .eq('id', currentPromise.id);
 
         if (error) {
-            alert("Error saving promise!");
+            alert("Connection error! Try again.");
         } else {
             currentPromise.is_accepted = true;
             updateUI();
