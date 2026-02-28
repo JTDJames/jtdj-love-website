@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promise Vault | jtdj.love</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root { --bg: #fdf6e3; --text: #586e75; --accent: #d33682; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); padding: 2rem; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 600px; width: 100%; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        h1 { font-size: 1.5rem; border-bottom: 2px solid var(--bg); padding-bottom: 10px; margin-bottom: 20px; }
+        .promise-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
+        .promise-card:last-child { border: none; }
+        .details { text-align: left; }
+        .details strong { color: var(--accent); }
+        .status { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+        .status.accepted { background: #e1f5fe; color: #0288d1; }
+        .status.waiting { background: #fff3e0; color: #ef6c00; }
+        #auth-error { display: none; color: #cc0000; font-weight: bold; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+<div id="auth-error">🔒 Access Denied. Provide a valid secret key.</div>
+
+<div class="container" id="vaultContainer" style="display: none;">
+    <h1>🤙 Pinky Swear History</h1>
+    <div id="promiseList">Loading vault...</div>
+</div>
+
+<script>
+    // --- SECURITY CONFIG ---
+    // Change 'mypassword' to whatever you want your secret key to be!
+    const SECRET_KEY = "pinky123"; 
+
+    const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+    async function checkAccess() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const userKey = urlParams.get('key');
+
+        if (userKey === SECRET_KEY) {
+            document.getElementById('vaultContainer').style.display = 'block';
+            loadHistory();
+        } else {
+            document.getElementById('auth-error').style.display = 'block';
+        }
+    }
+
+    async function loadHistory() {
+        const { data, error } = await supabaseClient
+            .from('promises')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            document.getElementById('promiseList').innerText = "Error loading vault.";
+            return;
+        }
+
+        const listEl = document.getElementById('promiseList');
+        listEl.innerHTML = "";
+
+        data.forEach(p => {
+            const card = document.createElement('div');
+            card.className = "promise-card";
+            const statusLabel = p.is_accepted ? "Accepted 🎉" : "Pending ⏳";
+            const statusClass = p.is_accepted ? "accepted" : "waiting";
+
+            card.innerHTML = `
+                <div class="details">
+                    <div><strong>${p.sender_name}</strong> → <strong>${p.recipient_name}</strong></div>
+                    <div style="font-size: 0.9rem; margin-top:5px;">"${p.promise_text}"</div>
+                </div>
+                <div class="status ${statusClass}">${statusLabel}</div>
+            `;
+            listEl.appendChild(card);
+        });
+    }
+
+    checkAccess();
+</script>
+</body>
+</html>
