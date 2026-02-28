@@ -6,52 +6,12 @@
     <title>Make a Pinky Promise | jtdj.love</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --bg: #fdf6e3;
-            --text: #586e75;
-            --accent: #d33682;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
-        }
-        .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            max-width: 400px;
-            width: 90%;
-        }
+        :root { --bg: #fdf6e3; --text: #586e75; --accent: #d33682; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
+        .container { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 400px; width: 90%; }
         h1 { margin-bottom: 1.5rem; font-size: 1.5rem; }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #eee;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        button {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            transition: transform 0.2s;
-        }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
+        button { background-color: var(--accent); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: transform 0.2s; }
         button:hover { transform: scale(1.05); }
         #linkContainer { display: none; margin-top: 20px; word-break: break-all; }
     </style>
@@ -63,61 +23,77 @@
     <input type="text" id="sender" placeholder="Your name">
     <input type="text" id="recipient" placeholder="Recipient's name">
     <input type="text" id="promise" placeholder="What do you promise?">
-    <button onclick="createPromise()">Generate Pinky Link</button>
+    <button id="generateBtn">Generate Pinky Link</button>
 </div>
 
 <div class="container" id="linkContainer">
     <p>Your pinky is extended! Send this link:</p>
     <h3 id="generatedLink"></h3>
-    <button onclick="copyLink()">Copy Link</button>
+    <button id="copyBtn">Copy Link</button>
 </div>
 
 <script>
-    // 1. Initialize Supabase
-    const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    // This tells the script to wait until the HTML is fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Checkpoint 1: Page loaded successfully!");
 
-    async function createPromise() {
-        const sender = document.getElementById('sender').value;
-        const recipient = document.getElementById('recipient').value;
-        const promiseText = document.getElementById('promise').value;
+        // 1. Initialize Supabase
+        const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        if (!sender || !recipient || !promiseText) return alert("Fill everything out!");
+        console.log("Checkpoint 2: Supabase connected!");
 
-        // Create a URL-friendly "slug"
-        const randomId = Math.random().toString(36).substring(7);
-        const slug = `${sender.toLowerCase()}-and-${recipient.toLowerCase()}-${randomId}`.replace(/\s+/g, '-');
+        // 2. Listen for the button click
+        document.getElementById('generateBtn').addEventListener('click', async () => {
+            console.log("Checkpoint 3: Button was clicked!");
+            
+            const sender = document.getElementById('sender').value;
+            const recipient = document.getElementById('recipient').value;
+            const promiseText = document.getElementById('promise').value;
 
-        // 2. Insert into Supabase
-        const { data, error } = await supabase
-            .from('promises')
-            .insert([
-                { 
-                    sender_name: sender, 
-                    recipient_name: recipient, 
-                    promise_text: promiseText, 
-                    slug: slug 
-                }
-            ]);
+            if (!sender || !recipient || !promiseText) {
+                return alert("Fill everything out!");
+            }
 
-        if (error) {
-            console.error("Supabase Error:", error);
-            alert("Error creating promise. Check the console.");
-        } else {
-            // 3. Show the link
-            const fullLink = `${window.location.origin}/promise/view.html?id=${slug}`;
-            document.getElementById('formContainer').style.display = 'none';
-            document.getElementById('linkContainer').style.display = 'block';
-            document.getElementById('generatedLink').innerText = fullLink;
-        }
-    }
+            // Create a URL-friendly "slug"
+            const randomId = Math.random().toString(36).substring(7);
+            const slug = `${sender.toLowerCase()}-and-${recipient.toLowerCase()}-${randomId}`.replace(/\s+/g, '-');
 
-    function copyLink() {
-        const link = document.getElementById('generatedLink').innerText;
-        navigator.clipboard.writeText(link);
-        alert("Link copied! Now send it to them.");
-    }
+            console.log("Checkpoint 4: Attempting to save to database...");
+            
+            // Insert into Supabase
+            const { data, error } = await supabase
+                .from('promises')
+                .insert([
+                    { 
+                        sender_name: sender, 
+                        recipient_name: recipient, 
+                        promise_text: promiseText, 
+                        slug: slug 
+                    }
+                ]);
+
+            if (error) {
+                console.error("Supabase Error:", error);
+                alert("Error creating promise. Check the console.");
+            } else {
+                console.log("Checkpoint 5: Success! Link generated.");
+                // Show the link
+                const fullLink = `${window.location.origin}/promise/view.html?id=${slug}`;
+                document.getElementById('formContainer').style.display = 'none';
+                document.getElementById('linkContainer').style.display = 'block';
+                document.getElementById('generatedLink').innerText = fullLink;
+            }
+        });
+
+        // 3. Listen for the copy button click
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const link = document.getElementById('generatedLink').innerText;
+            navigator.clipboard.writeText(link);
+            alert("Link copied! Now send it to them.");
+        });
+    });
 </script>
 
 </body>
