@@ -6,88 +6,141 @@
     <title>Make a Pinky Promise | jtdj.love</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root { --bg: #fdf6e3; --text: #586e75; --accent: #d33682; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; text-align: center; }
-        .container { background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 450px; width: 90%; }
-        h1 { margin-bottom: 1.5rem; font-size: 1.5rem; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #eee; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
-        button { background-color: var(--accent); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: bold; cursor: pointer; margin-top: 20px; transition: transform 0.2s; }
-        button:hover { transform: scale(1.05); }
-        #linkContainer { display: none; margin-top: 20px; text-align: left; }
-        .link-box { background: #f9f9f9; padding: 15px; border-radius: 10px; margin: 10px 0; border: 1px solid #eee; word-break: break-all; font-size: 0.9rem; }
-        .link-label { font-weight: bold; color: var(--accent); font-size: 0.8rem; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        :root { 
+            --bg: #fdf6e3; 
+            --text: #586e75; 
+            --accent: #d33682; 
+        }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            text-align: center; 
+        }
+        .container { 
+            background: white; 
+            padding: 2.5rem; 
+            border-radius: 30px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); 
+            max-width: 400px; 
+            width: 90%; 
+        }
+        h1 { margin-bottom: 0.5rem; font-size: 1.6rem; color: var(--text); }
+        p { font-size: 0.9rem; margin-bottom: 2rem; opacity: 0.8; }
+        
+        input { 
+            width: 100%; 
+            padding: 14px; 
+            margin: 10px 0; 
+            border: 2px solid #f4f4f4; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: var(--accent); }
+
+        button { 
+            background-color: var(--accent); 
+            color: white; 
+            border: none; 
+            padding: 16px 32px; 
+            border-radius: 50px; 
+            font-size: 1.1rem;
+            font-weight: bold; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            width: 100%;
+            transition: transform 0.2s, background-color 0.3s; 
+            box-shadow: 0 4px 15px rgba(211, 54, 130, 0.2);
+        }
+        button:hover { 
+            transform: scale(1.02);
+            background-color: #be2e75; 
+        }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .footer-logo { margin-top: 30px; font-weight: bold; font-size: 1.2rem; opacity: 0.5; }
     </style>
 </head>
 <body>
 
 <div class="container" id="formContainer">
-    <h1>🤙 Make a Pinky Promise</h1>
-    <input type="text" id="sender" placeholder="Your name">
-    <input type="text" id="recipient" placeholder="Recipient's name">
-    <input type="text" id="promise" placeholder="What do you promise?">
-    <button id="generateBtn">Generate Pinky Links</button>
+    <h1>🤙 Pinky Swear</h1>
+    <p>Create a digital bond that sparkles.</p>
+    
+    <input type="text" id="sender" placeholder="Your name (e.g., JJ)" required>
+    <input type="text" id="recipient" placeholder="Recipient's name" required>
+    <input type="text" id="promise" placeholder="What do you promise?" required>
+    
+    <button id="generateBtn">Generate & Extend Pinky</button>
 </div>
 
-<div class="container" id="linkContainer">
-    <h3>Links Generated! 🤙</h3>
-    
-    <div class="link-box">
-        <span class="link-label">1. Your Link (The Sender)</span>
-        <span id="senderLinkText"></span>
-        <button style="padding: 5px 15px; margin-top: 10px; font-size: 0.7rem;" onclick="copyLink('senderLinkText')">Copy My Link</button>
-    </div>
-
-    <div class="link-box">
-        <span class="link-label">2. Their Link (The Recipient)</span>
-        <span id="recipientLinkText"></span>
-        <button style="padding: 5px 15px; margin-top: 10px; font-size: 0.7rem;" onclick="copyLink('recipientLinkText')">Copy Their Link</button>
-    </div>
-    
-    <p style="font-size: 0.8rem; color: #888;">Send the second link to your friend. Use the first link to check if they've accepted!</p>
-</div>
+<div class="footer-logo">jtdj.love</div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+    // --- SUPABASE CONFIG ---
+    const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
+    const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        document.getElementById('generateBtn').addEventListener('click', async () => {
-            const sender = document.getElementById('sender').value;
-            const recipient = document.getElementById('recipient').value;
-            const promiseText = document.getElementById('promise').value;
+    const generateBtn = document.getElementById('generateBtn');
 
-            if (!sender || !recipient || !promiseText) return alert("Fill everything out!");
+    generateBtn.addEventListener('click', async () => {
+        const sender = document.getElementById('sender').value.trim();
+        const recipient = document.getElementById('recipient').value.trim();
+        const promiseText = document.getElementById('promise').value.trim();
 
-            const randomId = Math.random().toString(36).substring(7);
-            const slug = `${sender.toLowerCase()}-and-${recipient.toLowerCase()}-${randomId}`.replace(/\s+/g, '-');
+        if (!sender || !recipient || !promiseText) {
+            alert("Please fill in all the fields before extending your pinky!");
+            return;
+        }
 
+        // Disable button and show loading state
+        generateBtn.disabled = true;
+        generateBtn.innerText = "Creating Bond...";
+
+        // Generate a unique URL-friendly slug
+        const randomId = Math.random().toString(36).substring(7);
+        const slug = `${sender.toLowerCase()}-and-${recipient.toLowerCase()}-${randomId}`.replace(/\s+/g, '-');
+
+        try {
+            // 1. Insert into Supabase
             const { error } = await supabaseClient
                 .from('promises')
-                .insert([{ sender_name: sender, recipient_name: recipient, promise_text: promiseText, slug: slug }]);
+                .insert([{ 
+                    sender_name: sender, 
+                    recipient_name: recipient, 
+                    promise_text: promiseText, 
+                    slug: slug,
+                    is_accepted: false // Default state
+                }]);
 
-            if (error) {
-                alert("Error creating promise.");
-                console.error(error);
-            } else {
-                const baseUrl = window.location.origin + window.location.pathname.replace('index.html', 'view.html');
-                const sLink = `${baseUrl}?id=${slug}&role=s`;
-                const rLink = `${baseUrl}?id=${slug}&role=r`;
+            if (error) throw error;
 
-                document.getElementById('senderLinkText').innerText = sLink;
-                document.getElementById('recipientLinkText').innerText = rLink;
-                
-                document.getElementById('formContainer').style.display = 'none';
-                document.getElementById('linkContainer').style.display = 'block';
-            }
-        });
+            // 2. Build the Sender URL
+            // This assumes view.html is in the same 'promise' folder
+            const currentPath = window.location.pathname;
+            const newPath = currentPath.replace('index.html', 'view.html');
+            const senderUrl = `${window.location.origin}${newPath}?id=${slug}&role=s&new=true`;
+
+            // 3. Redirect!
+            window.location.href = senderUrl;
+
+        } catch (err) {
+            console.error("Supabase Error:", err);
+            alert("Something went wrong on our end. Please try again!");
+            generateBtn.disabled = false;
+            generateBtn.innerText = "Generate & Extend Pinky";
+        }
     });
-
-    function copyLink(id) {
-        const text = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(text);
-        alert("Link copied!");
-    }
 </script>
 
 </body>
