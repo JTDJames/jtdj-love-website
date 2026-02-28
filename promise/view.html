@@ -11,51 +11,42 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; text-align: center; overflow-x: hidden; }
         .container { background: white; padding: 2.5rem; border-radius: 35px; box-shadow: 0 15px 40px rgba(0,0,0,0.04); max-width: 500px; width: 90%; position: relative; z-index: 10; }
         
-        #statusNote { font-size: 0.75rem; color: #aaa; margin-top: 15px; }
-        .animation-area { height: 280px; position: relative; margin: 0; display: flex; justify-content: center; align-items: center; }
+        .animation-area { height: 300px; position: relative; margin: 0; display: flex; justify-content: center; align-items: center; }
 
-        /* --- THE ALIGNMENT FIX --- */
-        
-        /* Default: Hands are stationary in their "Home" (interlocked) position */
+        /* --- THE ALIGNMENT & FINGER FIX --- */
         #left-hand, #right-hand { 
             transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
             transform-origin: center center;
         }
 
-        /* State 1: Sender Waiting (Left hand stays home, Right hand is gone) */
-        .waiting-sender #left-hand { transform: translateX(0); }
-        .waiting-sender #right-hand { transform: translateX(300px); opacity: 0; }
+        /* State 1: Sender Waiting (Left hand stays home, Right hand is hidden) */
+        .waiting-sender #left-hand { transform: translateX(40px); }
+        .waiting-sender #right-hand { transform: translateX(350px); opacity: 0; }
 
-        /* State 2: Invitation (Hands are pulled apart to create the "ask") */
-        .invitation #left-hand { transform: translateX(-120px) rotate(-5deg); }
-        .invitation #right-hand { transform: translateX(120px) rotate(5deg); opacity: 1; }
+        /* State 2: Invitation (Hands pulled apart) */
+        .invitation #left-hand { transform: translateX(-100px) rotate(-8deg); }
+        .invitation #right-hand { transform: translateX(100px) rotate(8deg); opacity: 1; }
 
-        /* State 3: The Accepted Animation (Slide back to home 0,0) */
+        /* State 3: The Accepted Animation (Slide back to home) */
         .accepted #left-hand { animation: slideLeftHome 1.5s ease-out forwards; }
         .accepted #right-hand { opacity: 1; animation: slideRightHome 1.5s ease-out forwards; }
         .accepted #sparkles { animation: popIn 1.8s forwards; }
 
-        @keyframes slideLeftHome { 
-            0% { transform: translateX(-120px) rotate(-5deg); } 
-            100% { transform: translateX(0) rotate(0deg); } 
-        }
-        @keyframes slideRightHome { 
-            0% { transform: translateX(120px) rotate(5deg); } 
-            100% { transform: translateX(0) rotate(0deg); } 
-        }
-        @keyframes popIn { 
-            0%, 70% { opacity: 0; transform: scale(0.2); } 
-            85% { opacity: 1; transform: scale(1.1); } 
-            100% { opacity: 1; transform: scale(1); } 
-        }
+        @keyframes slideLeftHome { 0% { transform: translateX(-100px) rotate(-8deg); } 100% { transform: translateX(0) rotate(0deg); } }
+        @keyframes slideRightHome { 0% { transform: translateX(100px) rotate(8deg); } 100% { transform: translateX(0) rotate(0deg); } }
+        @keyframes popIn { 0%, 75% { opacity: 0; transform: scale(0.3); } 85% { opacity: 1; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
 
-        .sparkle-anim-1 { animation: twinkle 3s infinite alternate ease-in-out; transform-box: fill-box; transform-origin: center; }
+        /* Sparkle Twinkles */
+        .sparkle-anim-1, .sparkle-anim-2, .sparkle-anim-3 { transform-box: fill-box; transform-origin: center; }
+        .sparkle-anim-1 { animation: twinkle 3s infinite alternate ease-in-out; }
+        .sparkle-anim-2 { animation: twinkle 2.5s infinite alternate-reverse ease-in-out; }
         @keyframes twinkle { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(0.7); opacity: 0.5; } }
 
         button { background-color: var(--accent); color: white; border: none; padding: 16px 38px; border-radius: 50px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 15px rgba(211, 54, 130, 0.25); }
         button:hover { transform: scale(1.05); }
 
         #shareOverlay { display: none; position: fixed; bottom: 30px; background: #333; color: white; padding: 12px 20px; border-radius: 50px; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 100; }
+        #statusNote { font-size: 0.75rem; color: #aaa; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -68,20 +59,32 @@
         
         <div class="animation-area">
              <svg id="pinky-promise-animation" viewBox="-200 -50 912 612" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-                <g id="sparkle-positioner" transform="translate(110, -10) scale(0.6)">
+                <g id="sparkle-positioner" transform="translate(110, -15) scale(0.5)">
                     <g id="sparkles">
-                        <g class="sparkle-anim-1">
-                            <path style="fill:#F9D366;" d="M284.682,405.593l6.398-1.297c8.444-1.712,8.444-13.781,0-15.493l-6.398-1.297c-16.119-3.268-28.717-15.866-31.985-31.985l-1.297-6.398c-1.712-8.444-13.781-8.444-15.493,0l-1.297,6.398c-3.268,16.119-15.866,28.717-31.985,31.985l-6.398,1.297c-8.444,1.712-8.444,13.781,0,15.493l6.398,1.297c16.119,3.268,28.717,15.866,31.985,31.985l1.297,6.398c1.712,8.444,13.781,8.444,15.493,0l1.297-6.398C255.965,421.459,268.563,408.861,284.682,405.593z"/>
+                        <g class="sparkle-anim-1"><path style="fill:#F9D366;" d="M284.682,405.593l6.398-1.297c8.444-1.712,8.444-13.781,0-15.493l-6.398-1.297c-16.119-3.268-28.717-15.866-31.985-31.985l-1.297-6.398c-1.712-8.444-13.781-8.444-15.493,0l-1.297,6.398c-3.268,16.119-15.866,28.717-31.985,31.985l-6.398,1.297c-8.444,1.712-8.444,13.781,0,15.493l6.398,1.297c16.119,3.268,28.717,15.866,31.985,31.985l1.297,6.398c1.712,8.444,13.781,8.444,15.493,0l1.297-6.398C255.965,421.459,268.563,408.861,284.682,405.593z"/></g>
+                        <g class="sparkle-anim-2">
+                            <path style="fill:#DD8833;" d="M397.203,445.72c-4.267,0-7.726-3.459-7.726-7.726v-20.92c0-4.267,3.459-7.726,7.726-7.726s7.726,3.459,7.726,7.726v20.92C404.929,442.261,401.47,445.72,397.203,445.72z"/>
+                            <path style="fill:#DD8833;" d="M397.203,502.04c-4.267,0-7.726-3.459-7.726-7.726v-20.92c0-4.267,3.459-7.726,7.726-7.726s7.726,3.459,7.726,7.726v20.92C404.929,498.582,401.47,502.04,397.203,502.04z"/>
+                            <path style="fill:#DD8833;" d="M435.823,463.421h-20.92c-4.267,0-7.726-3.459-7.726-7.726s3.459-7.726,7.726-7.726h20.92c4.267,0,7.726,3.459,7.726,7.726S440.09,463.421,435.823,463.421z"/>
+                            <path style="fill:#DD8833;" d="M379.502,463.421h-20.92c-4.267,0-7.726-3.459-7.726-7.726s3.459-7.726,7.726-7.726h20.92c4.267,0,7.726,3.459,7.726,7.726S383.769,463.421,379.502,463.421z"/>
                         </g>
+                        <g class="sparkle-anim-1"><path style="fill:#F9D366;" d="M262.382,156.253l30.626-6.209c14.458-2.932,14.458-23.595,0-26.527l-30.626-6.209c-30.18-6.119-53.767-29.706-59.886-59.886l-6.209-30.626c-2.932-14.458-23.595-14.458-26.527,0l-6.209,30.626c-6.119,30.18-29.706,53.767-59.886,59.886l-30.626,6.209c-14.458,2.932-14.458,23.595,0,26.527l30.626,6.209c30.18,6.119,53.767,29.706,59.886,59.886l6.209,30.626c2.932,14.458,23.595,14.458,26.527,0l6.209-30.626C208.614,185.959,232.202,162.373,262.382,156.253z"/></g>
                     </g>
                 </g>
+
                 <g id="right-hand">
-                    <path d="m503.74 225.084 2.568 7.055c7.095 19.494 6.745 40.914-.989 60.154l-13.277 33.115 19.342 53.141c1.91 5.247-.796 11.05-6.043 12.96l-129.936 47.293c-5.247 1.91-11.05-.796-12.96-6.043l-19.342-53.141-26.907-29.395c-11.491-12.568-20.408-27.265-26.232-43.269l-73.894-202.99c-2.208-6.065-1.748-12.451.783-17.879 2.572-5.516 7.294-10.037 13.53-12.2 12.144-4.211 25.396 2.508 29.792 14.587l37.849 103.991 15.558 11.677 122.654-41.888 28.09 77.177z" fill="#D68A5A"/>
-                    <path d="m437.558 165.858-13.537-37.192c-4.414-12.128-17.825-18.381-29.953-13.967s-18.381 17.825-13.967 29.953l13.537 37.192z" fill="#D68A5A"/>
+                    <path d="m503.74 225.084 2.568 7.055c7.095 19.494 6.745 40.914-.989 60.154l-13.277 33.115 19.342 53.141c1.91 5.247-.796 11.05-6.043 12.96l-129.936 47.293c-5.247 1.91-11.05-.796-12.96-6.043l-19.342-53.141-26.907-29.395c-11.491-12.568-20.408-27.265-26.232-43.269l-73.894-202.99c-2.208-6.065-1.748-12.451.783-17.879 2.572-5.516 7.294-10.037 13.53-12.2 12.144-4.211 25.396 2.508 29.792 14.587l37.849 103.991 15.558 11.677 122.654-41.888 28.09 77.177z" fill="#d68a5a"/>
+                    <path d="m288.072 165.129-24.864 68.31-39.28-107.903 15.354-42.197c1.302-3.573 3.125-6.854 5.364-9.781 6.864 2.031 12.708 7.177 15.343 14.416z" fill="#c47a4a"/>
+                    <path d="m436.237 162.252 14.26 39.179-36.349 13.23c-4.318 9.26-11.947 16.242-21.513 19.724-19.739 7.184-41.64-3.028-48.824-22.767l-15.011-41.243c-4.175-11.471-2.481-23.668 3.55-33.286l18.393 50.533z" fill="#c47a4a"/>
+                    <path d="m437.558 165.858-13.537-37.192c-4.414-12.128-17.825-18.381-29.953-13.967s-18.381 17.825-13.967 29.953l13.537 37.192z" fill="#d68a5a"/>
+                    <path d="m355.305 213.182-15.011-41.242c-4.414-12.128-17.825-18.381-29.953-13.967l15.011 41.242c12.129-4.414 18.382-17.825 13.967-29.953z" fill="#d68a5a"/>
                 </g>
+
                 <g id="left-hand">
-                    <path d="m8.26 225.084-2.568 7.055c-7.095 19.494-6.745 40.914.989 60.154l13.277 33.115-19.341 53.141c-1.91 5.247.796 11.05 6.043 12.96l129.936 47.293c5.247 1.91 11.05-.796 12.96-6.043l19.342-53.141 26.907-29.395c11.491-12.568 20.408-27.265 26.232-43.269l73.894-202.99c2.208-6.065 1.748-12.451-.783-17.879-2.572-5.516-7.294-10.037-13.53-12.2-12.144-4.211-25.396 2.508-29.792 14.587l-37.169 102.121-16.239 13.547-122.655-41.888-28.09 77.177z" fill="#FDD1A7"/>
-                    <path d="m74.442 165.858 13.537-37.192c4.414-12.128 17.825-18.381 29.953-13.967s18.381 17.825 13.967 29.953l-13.537 37.192z" fill="#FFE5C4"/>
+                    <path d="m8.26 225.084-2.568 7.055c-7.095 19.494-6.745 40.914.989 60.154l13.277 33.115-19.341 53.141c-1.91 5.247.796 11.05 6.043 12.96l129.936 47.293c5.247 1.91 11.05-.796 12.96-6.043l19.342-53.141 26.907-29.395c11.491-12.568 20.408-27.265 26.232-43.269l73.894-202.99c2.208-6.065 1.748-12.451-.783-17.879-2.572-5.516-7.294-10.037-13.53-12.2-12.144-4.211-25.396 2.508-29.792 14.587l-37.169 102.121-16.239 13.547-122.655-41.888-28.09 77.177z" fill="#fdd1a7"/>
+                    <path d="m295.925 103.962-73.894 202.99c-5.825 16.004-14.741 30.701-26.232 43.269l-26.907 29.395-19.342 53.141-11.418-4.156 22.8-62.642 26.907-29.395c11.491-12.568 20.408-27.265 26.232-43.269l73.894-202.99c2.208-6.065 1.748-12.451-.783-17.879z" fill="#ffbc8a"/>
+                    <path d="m74.442 165.858 13.537-37.192c4.414-12.128 17.825-18.381 29.953-13.967s18.381 17.825 13.967 29.953l-13.537 37.192z" fill="#ffe5c4"/>
+                    <path d="m200.615 229.168 15.011-41.243c4.414-12.128-1.839-25.539-13.968-29.953l-1.671 24.293c12.129 4.415 25.539-1.839 29.953-13.967z" fill="#ffe5c4"/>
                 </g>
             </svg>
         </div>
@@ -153,7 +156,7 @@
             container.className = "container invitation";
             title.innerText = `${currentPromise.sender_name} extends a pinky...`;
             btn.style.display = 'inline-block';
-            document.getElementById('statusNote').innerText = "Check the promise below ↓";
+            document.getElementById('statusNote').innerText = "Accept the promise below ↓";
         }
         document.getElementById('promiseText').innerText = `"${currentPromise.promise_text}"`;
     }
