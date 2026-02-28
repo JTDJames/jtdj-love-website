@@ -6,11 +6,15 @@
     <title>Pinky Swear | jtdj.love</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+/* --- NEW CSS START --- */
         :root {
             --bg: #fdf6e3;
             --text: #586e75;
             --accent: #d33682;
-            --pinky-skin: #f1c27d; 
+            /* A nice peachy skin tone */
+            --skin: #FFDCB9; 
+            /* A slightly darker outline */
+            --skin-outline: #E5C1A0;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -47,69 +51,56 @@
         }
         button:hover { transform: scale(1.05); }
         
-        /* The Animation CSS */
+        /* --- THE NEW ANIMATION CSS --- */
         .animation-area {
-            height: 150px;
+            height: 200px; /* A bit taller for full hands */
             position: relative;
             margin: 20px 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: hidden;
+            /* overflow: hidden; Removed this so hands can enter from off-stage */
         }
-        /* The base finger shape with 3D shading */
-        .hand {
-            width: 45px;
-            height: 120px;
-            background-color: var(--pinky-skin);
-            border-radius: 25px 25px 0 0; /* Rounded top, flat bottom */
-            position: absolute;
-            transition: all 1s ease-in-out;
-            box-shadow: inset -5px 0 10px rgba(0,0,0,0.1); 
+
+        /* The SVG Container */
+        .hands-svg {
+            width: 300px;
+            height: 200px;
+            /* border: 1px solid red;  Uncomment for debugging positioning */
         }
-        /* The Fingernail */
-        .hand::after {
-            content: '';
-            position: absolute;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 25px;
-            height: 30px;
-            background-color: rgba(255, 255, 255, 0.4);
-            border-radius: 10px 10px 15px 15px;
-            border: 1px solid rgba(0,0,0,0.05);
+
+        /* Styles for the SVG shapes */
+        .hand-shape {
+            fill: var(--skin);
+            stroke: var(--skin-outline);
+            stroke-width: 3;
+            stroke-linejoin: round;
+            stroke-linecap: round;
+            transition: all 1.2s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth, bouncy transition */
         }
-        /* The Knuckle Crease */
-        .hand::before {
-            content: '';
-            position: absolute;
-            top: 60px;
-            left: 10px;
-            right: 10px;
-            height: 3px;
-            border-top: 2px solid rgba(0,0,0,0.1);
-            border-bottom: 1px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
+
+        /* Initial State: Waiting */
+        .left-hand-group {
+             /* Sits slightly to the left, rotated out */
+            transform: translateX(-40px) rotate(-10deg);
         }
-        .hand.left {
-            left: 20%;
-            transform: rotate(25deg);
+        .right-hand-group {
+            /* Hidden off-screen to the right */
+            transform: translateX(180px) rotate(10deg);
+            opacity: 0; 
         }
-        .hand.right {
-            right: -50px; 
-            transform: rotate(-25deg);
-            opacity: 0;
+
+        /* Final State: Interlocked (Triggered by JS adding this class) */
+        .animation-area.interlocked .left-hand-group {
+            /* Moves to center, hooks pinky */
+            transform: translateX(10px) rotate(5deg);
         }
-        .interlocked .hand.left {
-            left: calc(50% - 25px);
-            transform: rotate(15deg);
-        }
-        .interlocked .hand.right {
-            right: calc(50% - 25px);
-            transform: rotate(-15deg);
+        .animation-area.interlocked .right-hand-group {
+            /* Slides in, hooks pinky */
+            transform: translateX(-10px) rotate(-5deg);
             opacity: 1;
         }
+        /* --- NEW CSS END --- */
     </style>
 </head>
 <body>
@@ -121,10 +112,24 @@
         <h2 id="titleText"></h2>
         <p id="promiseText"></p>
         
-        <div class="animation-area" id="animArea">
-            <div class="hand left" id="leftHand"></div>
-            <div class="hand right" id="rightHand"></div>
+<div class="animation-area" id="animArea">
+            <svg class="hands-svg" viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+                <g class="left-hand-group">
+                    <path class="hand-shape" d="M 60,180 C 60,180 50,120 70,100 C 80,90 100,90 110,100 C 115,105 120,120 120,120 L 130,110 C 130,110 150,60 170,70 C 185,78 175,110 165,125 C 155,140 140,180 140,180 Z" />
+                </g>
+                
+                <g class="right-hand-group">
+                    <path class="hand-shape" d="M 240,180 C 240,180 250,120 230,100 C 220,90 200,90 190,100 C 185,105 180,120 180,120 L 170,110 C 170,110 150,60 130,70 C 115,78 125,110 135,125 C 145,140 160,180 160,180 Z" />
+                </g>
+            </svg>
         </div>
+        ```
+
+Leave the JavaScript at the bottom exactly as it is—it doesn't need to change because it still just adds the `.interlocked` class to the main container, and our new CSS knows what to do with that.
+
+Commit those changes, wait for the deploy, and refresh your test link. You should now see a cute, stylized hand waiting, and when you click "Pinky Promise," the second hand will slide in and hook pinkies!
+
+Let me know what you think of the new look. Once you're happy with the visuals, we'll implement the two-link (sender/receiver) logic.
         
         <button id="actionBtn" onclick="acceptPromise()">Pinky Promise</button>
     </div>
