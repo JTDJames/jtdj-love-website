@@ -10,6 +10,7 @@
             --bg: #fdf6e3;
             --text: #586e75;
             --accent: #d33682;
+            --line: #657b83; /* Professional slate gray for the outlines */
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -25,62 +26,89 @@
         }
         .container {
             background: white;
-            padding: 2.5rem;
+            padding: 3rem 2rem;
             border-radius: 30px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
             max-width: 450px;
             width: 90%;
         }
-        h2 { font-size: 1.6rem; margin-bottom: 0.5rem; color: var(--text); }
-        p { font-size: 1.1rem; line-height: 1.5; margin-bottom: 2rem; }
-        
-        /* The Illustration Area */
-        .illustration-container {
-            margin: 30px 0;
+        h2 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+        p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; }
+
+        /* --- THE SVG ANIMATION --- */
+        .animation-area {
+            height: 180px;
+            position: relative;
+            margin: 20px 0;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 150px;
         }
 
-        /* SVG Styling */
-        .pinky-icon {
-            width: 120px;
-            height: 120px;
+        .hand-svg {
+            width: 280px;
+            height: 150px;
+            overflow: visible;
+        }
+
+        .hand-group {
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Initial Positions */
+        #leftHandGroup { transform: translateX(-40px); }
+        #rightHandGroup { 
+            transform: translateX(120px) scaleX(-1); 
+            opacity: 0; 
+        }
+
+        /* The Outline Style */
+        .hand-path {
             fill: none;
-            stroke: var(--text);
-            stroke-width: 1.5;
+            stroke: var(--line);
+            stroke-width: 2.5;
             stroke-linecap: round;
             stroke-linejoin: round;
-            transition: all 0.5s ease;
-            opacity: 0.6;
         }
 
-        /* Animation when accepted */
-        .accepted .pinky-icon {
+        /* The Pinky "Joint" - This is what bends */
+        .pinky-joint {
+            transition: transform 0.8s ease-in-out;
+            transform-origin: 105px 65px; /* Base of the pinky */
+        }
+
+        #rightHandGroup .pinky-joint { transform-origin: 105px 65px; }
+
+        /* --- THE INTERLOCKED STATE --- */
+        .accepted #leftHandGroup {
+            transform: translateX(10px);
             stroke: var(--accent);
+        }
+
+        .accepted #rightHandGroup {
+            transform: translateX(-10px) scaleX(-1);
             opacity: 1;
-            transform: scale(1.2);
-            filter: drop-shadow(0 0 10px rgba(211, 54, 130, 0.2));
+            stroke: var(--accent);
+        }
+
+        /* The "Hook" Bend */
+        .accepted .pinky-joint {
+            transform: rotate(35deg);
         }
 
         button {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 16px 32px;
+            padding: 16px 35px;
             border-radius: 50px;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(211, 54, 130, 0.3);
+            transition: transform 0.2s;
+            box-shadow: 0 5px 15px rgba(211, 54, 130, 0.2);
         }
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(211, 54, 130, 0.4);
-        }
-        button:active { transform: translateY(0); }
+        button:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -92,13 +120,23 @@
         <h2 id="titleText"></h2>
         <p id="promiseText"></p>
         
-        <div class="illustration-container" id="illustrate">
-            <svg class="pinky-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18 10c-1.1 0-2 .9-2 2v3c0 1.1-.9 2-2 2s-2-.9-2-2v-3c0-1.1-.9-2-2-2s-2 .9-2 2v3c0 1.1-.9 2-2 2s-2-.9-2-2V8c0-1.1.9-2 2-2s2 .9 2 2v1"/>
-                <path d="M10 12c0-1.1.9-2 2-2s2 .9 2 2v3"/>
-                <path d="M14 10c0-1.1.9-2 2-2s2 .9 2 2v3"/>
-                <path d="M6 15c0 1.1.9 2 2 2s2-.9 2-2v-3c0-1.1-.9-2-2-2s-2 .9-2 2v3z"/>
-                <path d="M18 13c0 1.1.9 2 2 2s2-.9 2-2v-5c0-1.1-.9-2-2-2s-2 .9-2 2v5z"/>
+        <div class="animation-area" id="animArea">
+            <svg class="hand-svg" viewBox="0 0 240 150">
+                <g id="leftHandGroup" class="hand-group">
+                    <path class="hand-path" d="M40,110 C40,110 35,65 60,60 C85,55 95,75 95,75 L105,65" />
+                    <g class="pinky-joint">
+                        <path class="hand-path" d="M105,65 C105,65 125,40 135,55 C145,70 120,95 120,95" />
+                    </g>
+                    <path class="hand-path" d="M120,95 C120,95 100,120 70,120 C40,120 40,110 40,110" />
+                </g>
+
+                <g id="rightHandGroup" class="hand-group">
+                    <path class="hand-path" d="M40,110 C40,110 35,65 60,60 C85,55 95,75 95,75 L105,65" />
+                    <g class="pinky-joint">
+                        <path class="hand-path" d="M105,65 C105,65 125,40 135,55 C145,70 120,95 120,95" />
+                    </g>
+                    <path class="hand-path" d="M120,95 C120,95 100,120 70,120 C40,120 40,110 40,110" />
+                </g>
             </svg>
         </div>
         
@@ -118,7 +156,7 @@
         const slug = urlParams.get('id');
 
         if (!slug) {
-            document.getElementById('loading').innerText = "No promise link found.";
+            document.getElementById('loading').innerText = "Oops! No link found.";
             return;
         }
 
@@ -129,7 +167,7 @@
             .single();
 
         if (error || !data) {
-            document.getElementById('loading').innerText = "This promise doesn't exist yet!";
+            document.getElementById('loading').innerText = "Promise not found!";
             return;
         }
 
@@ -144,19 +182,19 @@
         const titleText = document.getElementById('titleText');
         const promiseTextEl = document.getElementById('promiseText');
         const actionBtn = document.getElementById('actionBtn');
-        const container = document.getElementById('mainContainer');
+        const mainContainer = document.getElementById('mainContainer');
         
         const urlParams = new URLSearchParams(window.location.search);
         const role = urlParams.get('role');
 
         if (currentPromise.is_accepted) {
             titleText.innerText = "It's Official! 🎉";
-            promiseTextEl.innerHTML = `<strong>${currentPromise.recipient_name}</strong> and <strong>${currentPromise.sender_name}</strong><br>have promised: "${currentPromise.promise_text}"`;
+            promiseTextEl.innerText = `${currentPromise.recipient_name} and ${currentPromise.sender_name} promised: "${currentPromise.promise_text}"`;
             actionBtn.style.display = 'none';
-            container.classList.add('accepted');
+            mainContainer.classList.add('accepted');
         } else {
             if (role === 's') {
-                titleText.innerText = "Awaiting the promise...";
+                titleText.innerText = "Waiting for them to promise...";
                 promiseTextEl.innerText = `You're asking ${currentPromise.recipient_name} to promise: "${currentPromise.promise_text}"`;
                 actionBtn.style.display = 'none';
             } else {
@@ -174,7 +212,7 @@
             .eq('id', currentPromise.id);
 
         if (error) {
-            alert("Connection error! Try again.");
+            alert("Connection error! Please try again.");
         } else {
             currentPromise.is_accepted = true;
             updateUI();
