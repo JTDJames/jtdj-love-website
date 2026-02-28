@@ -10,7 +10,7 @@
             --bg: #fdf6e3;
             --text: #586e75;
             --accent: #d33682;
-            --line: #657b83; /* Professional slate gray for the outlines */
+            --line: #657b83; /* Sleek slate for the initial outline */
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -27,8 +27,8 @@
         .container {
             background: white;
             padding: 3rem 2rem;
-            border-radius: 30px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border-radius: 35px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.04);
             max-width: 450px;
             width: 90%;
         }
@@ -43,78 +43,82 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            overflow: visible;
         }
 
         .hand-svg {
-            width: 280px;
+            width: 300px;
             height: 150px;
             overflow: visible;
         }
 
         .hand-group {
-            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Initial Positions */
-        #leftHandGroup { transform: translateX(-40px); }
+        /* Initial Positions - Hands start apart */
+        #leftHandGroup { transform: translateX(-45px); }
         #rightHandGroup { 
-            transform: translateX(120px) scaleX(-1); 
+            transform: translateX(130px) scaleX(-1); 
             opacity: 0; 
         }
 
-        /* The Outline Style */
         .hand-path {
             fill: none;
             stroke: var(--line);
-            stroke-width: 2.5;
+            stroke-width: 2.2;
             stroke-linecap: round;
             stroke-linejoin: round;
+            transition: stroke 0.8s ease;
         }
 
-        /* The Pinky "Joint" - This is what bends */
+        /* The Pinky Joint - This creates the bend */
         .pinky-joint {
-            transition: transform 0.8s ease-in-out;
-            transform-origin: 105px 65px; /* Base of the pinky */
+            transition: transform 1s ease-in-out;
+            transform-origin: 105px 65px; /* knuckle position */
         }
-
-        #rightHandGroup .pinky-joint { transform-origin: 105px 65px; }
 
         /* --- THE INTERLOCKED STATE --- */
         .accepted #leftHandGroup {
-            transform: translateX(10px);
-            stroke: var(--accent);
+            transform: translateX(5px);
         }
 
         .accepted #rightHandGroup {
-            transform: translateX(-10px) scaleX(-1);
+            transform: translateX(-5px) scaleX(-1);
             opacity: 1;
+        }
+
+        .accepted .hand-path {
             stroke: var(--accent);
         }
 
-        /* The "Hook" Bend */
+        /* The signature Pinky Hook */
         .accepted .pinky-joint {
-            transform: rotate(35deg);
+            transform: rotate(38deg);
         }
 
         button {
             background-color: var(--accent);
             color: white;
             border: none;
-            padding: 16px 35px;
+            padding: 16px 38px;
             border-radius: 50px;
             font-size: 1.1rem;
-            font-weight: bold;
+            font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s;
-            box-shadow: 0 5px 15px rgba(211, 54, 130, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(211, 54, 130, 0.25);
         }
-        button:hover { transform: scale(1.05); }
+        button:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(211, 54, 130, 0.35);
+        }
     </style>
 </head>
 <body>
 
 <div class="container" id="mainContainer">
-    <div id="loading">Gathering the promise...</div>
+    <div id="loading">Syncing the swear...</div>
     
     <div id="content" style="display: none;">
         <h2 id="titleText"></h2>
@@ -123,19 +127,19 @@
         <div class="animation-area" id="animArea">
             <svg class="hand-svg" viewBox="0 0 240 150">
                 <g id="leftHandGroup" class="hand-group">
-                    <path class="hand-path" d="M40,110 C40,110 35,65 60,60 C85,55 95,75 95,75 L105,65" />
+                    <path class="hand-path" d="M35,115 C35,115 30,65 55,60 C80,55 95,75 95,75 L105,65" />
                     <g class="pinky-joint">
-                        <path class="hand-path" d="M105,65 C105,65 125,40 135,55 C145,70 120,95 120,95" />
+                        <path class="hand-path" d="M105,65 C105,65 125,35 138,52 C150,70 120,100 120,100" />
                     </g>
-                    <path class="hand-path" d="M120,95 C120,95 100,120 70,120 C40,120 40,110 40,110" />
+                    <path class="hand-path" d="M120,100 C120,100 100,125 65,125 C35,125 35,115 35,115" />
                 </g>
 
                 <g id="rightHandGroup" class="hand-group">
-                    <path class="hand-path" d="M40,110 C40,110 35,65 60,60 C85,55 95,75 95,75 L105,65" />
+                    <path class="hand-path" d="M35,115 C35,115 30,65 55,60 C80,55 95,75 95,75 L105,65" />
                     <g class="pinky-joint">
-                        <path class="hand-path" d="M105,65 C105,65 125,40 135,55 C145,70 120,95 120,95" />
+                        <path class="hand-path" d="M105,65 C105,65 125,35 138,52 C150,70 120,100 120,100" />
                     </g>
-                    <path class="hand-path" d="M120,95 C120,95 100,120 70,120 C40,120 40,110 40,110" />
+                    <path class="hand-path" d="M120,100 C120,100 100,125 65,125 C35,125 35,115 35,115" />
                 </g>
             </svg>
         </div>
@@ -145,6 +149,7 @@
 </div>
 
 <script>
+    // 1. Setup - Using supabaseClient to prevent variable collision errors
     const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
     const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
@@ -156,7 +161,7 @@
         const slug = urlParams.get('id');
 
         if (!slug) {
-            document.getElementById('loading').innerText = "Oops! No link found.";
+            document.getElementById('loading').innerText = "Broken link! No promise ID found.";
             return;
         }
 
@@ -167,7 +172,7 @@
             .single();
 
         if (error || !data) {
-            document.getElementById('loading').innerText = "Promise not found!";
+            document.getElementById('loading').innerText = "Promise not found in our database!";
             return;
         }
 
@@ -189,12 +194,12 @@
 
         if (currentPromise.is_accepted) {
             titleText.innerText = "It's Official! 🎉";
-            promiseTextEl.innerText = `${currentPromise.recipient_name} and ${currentPromise.sender_name} promised: "${currentPromise.promise_text}"`;
+            promiseTextEl.innerHTML = `<strong>${currentPromise.recipient_name}</strong> and <strong>${currentPromise.sender_name}</strong><br>have promised: "${currentPromise.promise_text}"`;
             actionBtn.style.display = 'none';
             mainContainer.classList.add('accepted');
         } else {
             if (role === 's') {
-                titleText.innerText = "Waiting for them to promise...";
+                titleText.innerText = "Awaiting the promise...";
                 promiseTextEl.innerText = `You're asking ${currentPromise.recipient_name} to promise: "${currentPromise.promise_text}"`;
                 actionBtn.style.display = 'none';
             } else {
