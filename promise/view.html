@@ -21,28 +21,22 @@
 
         /* 1. SENDER WAITING: Only Left Hand centered, Right Hand hidden */
         .waiting-sender #left-hand { transform: translateX(45px) rotate(0deg); }
-        .waiting-sender #right-hand { transform: translateX(350px); opacity: 0; }
+        .waiting-sender #right-hand { transform: translateX(400px); opacity: 0; }
 
         /* 2. INVITATION: Hands pulled apart to create the gap */
         .invitation #left-hand { transform: translateX(-90px) rotate(-10deg); }
         .invitation #right-hand { transform: translateX(90px) rotate(10deg); opacity: 1; }
 
         /* 3. ACCEPTED: Hands slide into their perfect "Home" positions */
-        .accepted #left-hand { animation: slideHome 1.8s ease-in-out forwards; }
-        .accepted #right-hand { opacity: 1; animation: slideHome 1.8s ease-in-out forwards; }
+        .accepted #left-hand { animation: slideHomeLeft 1.8s ease-in-out forwards; }
+        .accepted #right-hand { opacity: 1; animation: slideHomeRight 1.8s ease-in-out forwards; }
         .accepted #sparkles { animation: popIn 2s forwards; }
 
-        @keyframes slideHome { 
-            0% { transform: translateX(var(--start-x, -90px)) rotate(var(--start-rot, -10deg)); }
-            100% { transform: translateX(0) rotate(0deg); } 
-        }
-        /* Specific start positions for the "Home" animation */
-        .accepted #left-hand { --start-x: -90px; --start-rot: -10deg; }
-        .accepted #right-hand { --start-x: 90px; --start-rot: 10deg; }
-
+        @keyframes slideHomeLeft { 0% { transform: translateX(-90px) rotate(-10deg); } 100% { transform: translateX(0) rotate(0deg); } }
+        @keyframes slideHomeRight { 0% { transform: translateX(90px) rotate(10deg); } 100% { transform: translateX(0) rotate(0deg); } }
         @keyframes popIn { 0%, 75% { opacity: 0; transform: scale(0.4); } 85% { opacity: 1; transform: scale(1.1); } 100% { opacity: 1; transform: scale(1); } }
 
-        /* Your Sparkle Twist/Twinkle animations */
+        /* Sparkle Twist/Twinkle animations */
         .sparkle-anim-1, .sparkle-anim-2, .sparkle-anim-3 { transform-box: fill-box; transform-origin: center; }
         .sparkle-anim-1 { animation: twinkle-1 3s infinite alternate ease-in-out 2s; }
         .sparkle-anim-2 { animation: twinkle-2 2.5s infinite alternate-reverse ease-in-out 2s; }
@@ -109,10 +103,10 @@
                     <path d="m74.442 165.858 13.537-37.192c4.414-12.128 17.825-18.381 29.953-13.967s18.381 17.825 13.967 29.953l-13.537 37.192z" fill="#ffe5c4"/>
                     <path d="m74.443 165.858 43.922 15.987 13.536-37.188c-.606-1.665-1.005-3.353-1.215-5.041-3.572-2.809-7.662-5.119-12.182-6.765l-29.337-10.678c-1.502 1.905-2.739 4.082-3.618 6.497z" fill="#fdd1a7"/>
                     <path d="m200.615 229.168 15.011-41.243c4.414-12.128-1.839-25.539-13.968-29.953-12.128-4.414-25.539 1.839-29.953 13.968l-13.34 16.949-1.671 24.293c-4.414 12.128 1.839 25.539 13.968 29.953 12.129 4.415 25.539-1.839 29.953-13.967z" fill="#ffe5c4"/>
-                    <path d="m215.625 187.924-15.012 41.246c-2.206 6.06-6.659 10.661-12.083 13.182-5.417 2.535-11.794 2.993-17.865.783-3.307-1.204-6.18-3.071-8.508-5.404 2.743-.234 5.41-.955 7.884-2.108 5.424-2.52 9.878-7.122 12.083-13.182l15.012-41.246c3.211-8.823.774-18.325-5.467-24.547 3.283-.291 6.684.125 9.992 1.329 12.129 4.414 18.379 17.816 13.964 29.947z" fill="#fdd1a7"/>
+                    <path d="m215.625 187.924-15.012 41.246c-2.206 6.06-6.659 10.661-12.083 13.182-5.417 2.535-11.794 2.993-17.865.783-3.307-1.204-6.18-3.071-8.508-5.404 2.743-.234 5.41-.955 7.884-2.108 5.424-2.52 9.878-7.122 12.083-13.182l15.012-41.246c3.211-8.823-5.467-24.547 3.283-.291 6.684.125 9.992 1.329 12.129 4.414 18.379 17.816 13.964 29.947z" fill="#fdd1a7"/>
                     <path d="m126.747 227.146c12.123 4.412 25.538-1.833 29.954-13.968l15.008-41.233c2.208-6.067 1.746-12.46-.781-17.879-2.527-5.42-7.131-9.871-13.187-12.075-6.876-2.503-14.15-1.58-19.968 1.893-4.458 2.662-8.072 6.816-9.986 12.074l-15.008 41.233c-2.139 5.877-1.775 12.058.563 17.369-.059.17-.143.348-.218.511 2.528 5.419 7.12 9.866 13.187 12.075z" fill="#ffe5c4"/>
-                    <path d="m171.713 171.943-15.015 41.233c-4.419 12.133-17.826 18.382-29.949 13.974-2.599-.95-4.924-2.305-6.936-3.984 10.071.627 19.777-5.359 23.407-15.329l15.005-41.233c2.214-6.077 1.749-12.467-.779-17.887-1.446-3.094-3.569-5.875-6.249-8.099 2.184.131 4.388.586 6.542 1.375 6.057 2.204 10.657 6.653 13.185 12.073s2.994 11.81.789 17.877z" fill="#fdd1a7"/>
-                    <path d="m113.342 214.56c14.799-2.239 27.958-12.296-33.431-27.333-.173-.476-.346-.952-.496-1.436 4.899-15.125-.807-30.976-9.496-41.907-4.458 2.662-8.072 6.816-9.986 12.074l-15.008 41.233c-2.139 5.877-1.775 12.059-.563 17.369z" fill="#fdd1a7"/>
+                    <path d="m171.713 171.943-15.015 41.233c-4.419 12.133-17.826 18.382-29.949 13.974-2.599-.95-4.924-2.305-6.936-3.984 10.071.627 19.777-5.359 23.407-15.329l15.005-41.233c2.214-6.077 1.749-12.46-.779-17.887-1.446-3.094-3.569-5.875-6.249-8.099 2.184.131 4.388.586 6.542 1.375 6.057 2.204 10.657 6.653 13.185 12.073s2.994 11.81.789 17.877z" fill="#fdd1a7"/>
+                    <path d="m113.342 214.56c14.799-2.239 27.958-12.296-33.431-27.333-.173-.476-.346-.952-.496-1.436-4.899-15.125-.807-30.976-9.496-41.907-4.458 2.662-8.072 6.816-9.986 12.074l-15.008 41.233c-2.139 5.877-1.775 12.059-.563 17.369z" fill="#fdd1a7"/>
                     <path d="m36.796 146.685-31.104 85.457c-7.094 19.492-6.746 40.908.985 60.165l13.279 33.093-19.343 53.147c-1.91 5.247.796 11.05 6.043 12.96l58.075 21.138 43.934-120.707c9.591-26.35-3.996-55.486-30.346-65.076l-13.933-5.071 11.917-32.743 21.935 7.984c13.677 4.978 28.847-2.344 33.378-16.317 4.315-13.315-3.157-27.609-16.312-32.397l-46.057-16.763c-13.14-4.784-27.669 1.991-32.451 15.13z" fill="#ffe5c4"/>
                 </g>
             </svg>
@@ -164,23 +158,27 @@
 
     function updateUI(role) {
         const container = document.getElementById('mainContainer');
+        const promiseTextEl = document.getElementById('promiseText');
+        
         if (currentPromise.is_accepted) {
             container.className = "container accepted";
             document.getElementById('titleText').innerText = "It's Official! 🎉";
+            promiseTextEl.innerHTML = `<strong>${currentPromise.recipient_name}</strong> and <strong>${currentPromise.sender_name}</strong> promised:<br>"${currentPromise.promise_text}"`;
             document.getElementById('actionBtn').style.display = 'none';
             document.getElementById('statusNote').style.display = 'none';
         } else if (role === 's') {
             container.className = "container waiting-sender";
             document.getElementById('titleText').innerText = "Pinky Extended...";
+            promiseTextEl.innerText = `Waiting for Dak to promise: "${currentPromise.promise_text}"`;
             document.getElementById('actionBtn').style.display = 'none';
             document.getElementById('statusNote').innerHTML = "Waiting for them... 📡";
         } else {
             container.className = "container invitation";
             document.getElementById('titleText').innerText = `${currentPromise.sender_name} extends a pinky...`;
+            promiseTextEl.innerText = `Do you promise: "${currentPromise.promise_text}"?`;
             document.getElementById('actionBtn').style.display = 'inline-block';
-            document.getElementById('statusNote').innerText = "Check the promise below ↓";
+            document.getElementById('statusNote').innerText = "Accept the promise below ↓";
         }
-        document.getElementById('promiseText').innerText = `"${currentPromise.promise_text}"`;
     }
 
     async function acceptPromise() {
