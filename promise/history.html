@@ -8,31 +8,53 @@
     <style>
         :root { --bg: #fdf6e3; --text: #586e75; --accent: #d33682; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); padding: 2rem; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 600px; width: 100%; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-        h1 { font-size: 1.5rem; border-bottom: 2px solid var(--bg); padding-bottom: 10px; margin-bottom: 20px; }
+        .container { max-width: 650px; width: 100%; background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        .header-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg); padding-bottom: 15px; margin-bottom: 20px; }
+        h1 { font-size: 1.4rem; margin: 0; }
+        
         .promise-card { border-bottom: 1px solid #eee; padding: 15px 0; display: flex; justify-content: space-between; align-items: center; }
         .promise-card:last-child { border: none; }
         .details { text-align: left; }
         .details strong { color: var(--accent); }
-        .status { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; font-weight: bold; }
-        .status.accepted { background: #e1f5fe; color: #0288d1; }
+        
+        .status { font-size: 0.75rem; padding: 4px 12px; border-radius: 20px; font-weight: bold; text-transform: uppercase; }
+        .status.accepted { background: #e8f5e9; color: #2e7d32; }
         .status.waiting { background: #fff3e0; color: #ef6c00; }
+
+        /* Button Styling */
+        .btn-export { 
+            background: var(--text); 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.8rem; 
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+        .btn-export:hover { opacity: 0.8; }
+        
         #auth-error { display: none; color: #cc0000; font-weight: bold; margin-top: 50px; }
     </style>
 </head>
 <body>
 
-<div id="auth-error">🔒 Access Denied. Provide a valid secret key.</div>
+<div id="auth-error">🔒 Access Denied.</div>
 
 <div class="container" id="vaultContainer" style="display: none;">
-    <h1>🤙 Pinky Swear History</h1>
+    <div class="header-row">
+        <h1>🤙 Promise Vault</h1>
+        <button class="btn-export" onclick="exportToCSV()">Export .CSV</button>
+    </div>
     <div id="promiseList">Loading vault...</div>
 </div>
 
 <script>
-    // --- SECURITY CONFIG ---
-    // Change 'mypassword' to whatever you want your secret key to be!
-    const SECRET_KEY = "pinky123"; 
+    // --- CONFIG ---
+    const SECRET_KEY = "pinky123"; // Make sure this matches your secret!
+    let allPromises = []; // Store data globally for the export function
 
     const supabaseUrl = 'https://euollkzgqskcehpryzvk.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV1b2xsa3pncXNrY2VocHJ5enZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyNTY2MDYsImV4cCI6MjA4NzgzMjYwNn0.Vl-X_vrbaWlMUh_OeJe5tbHvcxkt_j4bjHMIZpRJZrc';
@@ -40,9 +62,7 @@
 
     async function checkAccess() {
         const urlParams = new URLSearchParams(window.location.search);
-        const userKey = urlParams.get('key');
-
-        if (userKey === SECRET_KEY) {
+        if (urlParams.get('key') === SECRET_KEY) {
             document.getElementById('vaultContainer').style.display = 'block';
             loadHistory();
         } else {
@@ -56,18 +76,20 @@
             .select('*')
             .order('created_at', { ascending: false });
 
-        if (error) {
-            document.getElementById('promiseList').innerText = "Error loading vault.";
-            return;
+        if (!error) {
+            allPromises = data;
+            renderList();
         }
+    }
 
+    function renderList() {
         const listEl = document.getElementById('promiseList');
         listEl.innerHTML = "";
 
-        data.forEach(p => {
+        allPromises.forEach(p => {
             const card = document.createElement('div');
             card.className = "promise-card";
-            const statusLabel = p.is_accepted ? "Accepted 🎉" : "Pending ⏳";
+            const statusLabel = p.is_accepted ? "Accepted" : "Pending";
             const statusClass = p.is_accepted ? "accepted" : "waiting";
 
             card.innerHTML = `
@@ -79,6 +101,37 @@
             `;
             listEl.appendChild(card);
         });
+    }
+
+    // --- CSV EXPORT LOGIC ---
+    function exportToCSV() {
+        if (allPromises.length === 0) return alert("No data to export!");
+
+        // Define Headers
+        const headers = ["Date", "Sender", "Recipient", "Promise", "Status"];
+        
+        // Format Rows
+        const rows = allPromises.map(p => [
+            new Date(p.created_at).toLocaleDateString(),
+            p.sender_name,
+            p.recipient_name,
+            `"${p.promise_text.replace(/"/g, '""')}"`, // Escape quotes for CSV
+            p.is_accepted ? "Accepted" : "Pending"
+        ]);
+
+        // Combine into one string
+        const csvContent = [headers, ...rows].map(e => e.join(",")).join("\n");
+
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `pinky_promises_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        
+        link.click(); // Trigger download
+        document.body.removeChild(link);
     }
 
     checkAccess();
